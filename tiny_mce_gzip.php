@@ -62,6 +62,10 @@
 		foreach ($custom as $file)
 			$cacheKey .= $file;
 
+		// Add modification date of core JS file, so that the disk cache expires on
+		// TinyMCE upgrade/changes:
+		$last_mod_time = @filemtime('tiny_mce'.$suffix.'.js');
+		$cacheKey .= $last_mod_time;
 		$cacheKey = md5($cacheKey);
 
 		if ($compress)
