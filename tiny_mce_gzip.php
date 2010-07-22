@@ -68,10 +68,23 @@
 		$cacheKey .= $last_mod_time;
 		$cacheKey = md5($cacheKey);
 
+		$cacheFile = $cachePath.'/tiny_mce_'.$cacheKey;
 		if ($compress)
-			$cacheFile = $cachePath . "/tiny_mce_" . $cacheKey . ".gz";
+			$cacheFile .= '.gz';
 		else
-			$cacheFile = $cachePath . "/tiny_mce_" . $cacheKey . ".js";
+			$cacheFile .= '.js';
+
+		// Remove old cache files on every ~1000th request:
+		if( rand(0,10000) < 10 )
+		{
+			foreach( glob($cachePath.'/tiny_mce_*.{gz,js}', GLOB_NOSORT|GLOB_BRACE) as $old_cache_file )
+			{
+				if( filectime($old_cache_file) < $last_mod_time )
+				{
+					@unlink($old_cache_file);
+				}
+			}
+		}
 	}
 
 	// Check if it supports gzip
